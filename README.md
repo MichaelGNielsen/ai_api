@@ -40,3 +40,21 @@ Med et blødt miav trykkede hun på en rød knap. Raketten brølede til live og 
 
 Da hendes eventyr var slut, fløj Luna hjem igen. Træt, men lykkelig, krøllede hun sig sammen i sin kurv, mens pelsen stadig glimtede af månestøv.
 ````
+
+## kør fra docker image term
+
+For at åbne en terminal (command prompt) inde i dit Docker image:
+
+### 1. Med ren Docker kommando
+
+````bash
+# Hvis du har bygget billedet som min-ai-app
+docker run --rm -it min-ai-app /bin/bash 
+````
+
+### 2. Med Docker Compose
+
+````bash
+# Hvis du bruger docker-compose.yml filen
+docker compose run --rm ai-app /bin/bash
+````
