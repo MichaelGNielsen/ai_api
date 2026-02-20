@@ -49,7 +49,8 @@ For at åbne en terminal (command prompt) inde i dit Docker image:
 
 ````bash
 # Hvis du har bygget billedet som min-ai-app
-docker run --rm -it min-ai-app /bin/bash 
+docker run --rm -it --add-host=host.docker.internal:host-gateway -e LLM_HOST=host.docker.internal min-ai-app /bin/bash
+python ai_call_http.py
 ````
 
 ### 2. Med Docker Compose
@@ -57,4 +58,5 @@ docker run --rm -it min-ai-app /bin/bash
 ````bash
 # Hvis du bruger docker-compose.yml filen
 docker compose run --rm ai-app /bin/bash
+python ai_test.py
 ````

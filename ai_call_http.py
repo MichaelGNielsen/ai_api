@@ -1,6 +1,9 @@
 import requests
+import os
 
-url = "http://localhost:12434/engines/llama.cpp/v1/chat/completions"
+# Hent host fra miljøvariabel eller brug 'localhost' som standard (til lokal kørsel)
+llm_host = os.getenv("LLM_HOST", "localhost")
+url = f"http://{llm_host}:12434/engines/llama.cpp/v1/chat/completions"
 
 data = {
     "model": "ai/smollm2",
