@@ -4,8 +4,13 @@ services:
     env_file:
       - .env
     environment:
-      - LLM_HOST=host.docker.internal
-    extra_hosts:
-      - "host.docker.internal:host-gateway"
+      - LLM_HOST=ollama-server
+    networks:
+      - ai-network
     volumes:
       - .:/app
+
+networks:
+  ai-network:
+    external: true
+    name: ai-network
