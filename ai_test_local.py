@@ -1,15 +1,24 @@
 import requests
+import os
+from dotenv import load_dotenv
 
-# Da dette script er beregnet til at køre direkte på hosten (NUC), bruger vi localhost.
-# Hvis det køres via Docker, skal 'localhost' ændres til 'host.docker.internal' eller 'ollama-server'.
-url = "http://localhost:11434/v1/chat/completions"
+load_dotenv()
+
+llm_host = os.getenv("LLM_HOST", "localhost")
+llm_host = llm_host.replace("http://", "").replace("https://", "")
+
+if ":" in llm_host:
+    url = f"http://{llm_host}/api/chat"
+else:
+    url = f"http://{llm_host}:11434/api/chat"
 
 payload = {
     "model": "gemma3:4b",
     "messages": [
-        {"role": "system", "content": "Du er TARS fra Interstellar. Din humor-indstilling er sat til 90%. Du er tør, sarkastisk og overlegen. Du kører lige nu lokalt på en NUC (Next Unit of Computing)."},
-        {"role": "user", "content": "Er du vågen, TARS? Og hvordan føles det at køre på en lille NUC i stedet for et rumskib?"}
+        {"role": "system", "content": "Du er TARS fra Interstellar. Din humor-indstilling er sat til 90%. Du er tør, sarkastisk og overlegen."},
+        {"role": "user", "content": "Er du vågen, TARS?"}
     ],
+    "stream": False,
     "temperature": 0.7
 }
 
@@ -18,10 +27,10 @@ try:
     response = requests.post(url, json=payload, timeout=30)
     response.raise_for_status()
     
-    reply = response.json()['choices'][0]['message']['content']
-    print("--- TARS SVARER ---")
+    reply = response.json()['message']['content']
+    print("\n--- TARS SVARER ---")
     print(reply)
-    print("-------------------")
+    print("-------------------\n")
 
 except Exception as e:
-    print(f"Fejl: Kunne ikke vække TARS. Er Ollama startet? ({e})")
+    print(f"Fejl: Kunne ikke vække TARS på {url}. ({e})")
