@@ -2,80 +2,59 @@
 
 ### Miljø
 - **OS:** Windows 11 / Ubuntu 24.04 (WSL2)
-- **Docker:** Docker Engine i Ubuntu (ikke Docker Desktop)
+- **Ollama:** Kører enten i Windows (Ollama for Windows) eller i Docker.
 
-### Netværksopsætning
-For at få `ai-app` til at tale med `ollama-server`, brugte vi et fælles Docker-netværk:
-```bash
-docker network create ai-network
-docker network connect ai-network ollama-server
+### Netværksopsætning (VIGTIGT for WSL2)
+For at få Docker-containere til at se Ollama på hosten i WSL2, er den mest stabile løsning at bruge `network_mode: host` i `docker-compose.yml`:
+
+```yaml
+services:
+  ai-app:
+    network_mode: host
+    environment:
+      - LLM_HOST=localhost
 ```
+
+Dette gør, at `localhost` inde i containeren peger direkte på din WSL/Windows host.
 
 ### Resultater
 - **Model:** `gemma3:4b`
 - **Status:** Virker! 🚀
-- **Note:** Brug `LLM_HOST=ollama-server` i `.env`.
+- **Note:** Hvis du ser 404-fejl på `/v1/chat/completions`, så brug det indfødte `/api/chat` endpoint i stedet.
 
-# run the scripts
-
-## cloud call
+## running test on WSL
 
 ````bash
+# docker compose run --rm ai-app python ai_test.py
 docker compose run --rm ai-app python ai_test.py
-Container ai_api-ai-app-run-623aa8d5c8f2 Creating 
-Container ai_api-ai-app-run-623aa8d5c8f2 Created 
+
+Container ai_api-ai-app-run-cd6149a1c8fc Creating 
+Container ai_api-ai-app-run-cd6149a1c8fc Created 
 Forsøger at kontakte Gemini Cloud (gemini-2.5-flash)...
 
 SVAR FRA CLOUD AI:
-Katten Luna drømte altid om månen. En stjerneklar nat fandt hun en magisk, sølvglinsende raket i sin have. Med et dristigt spring og et spændt miao hoppede hun ind. Med et sus skød raketten op, forbi funklende stjerner og sovende skyer.
+Miv var en nysgerrig kat med en stor drøm: at nå månen. Hver aften sad hun på vindueskarmen og stirrede længselsfuldt op mod den skinnende kugle.
 
-Snart landede Luna blødt på den store, runde ost. Hun hoppede ud og snusede til det kolde, glitrende støv. Jorden lignede en smuk, blå marmorkugle langt væk. Efter at have jagtet nogle månestøvsmus, vendte Luna tilbage til sin raket.
+En nat, mens verden sov, fandt Miv en lille, forladt rumraket gemt i en busk. Uden at tøve hoppede hun ind og trykkede på den eneste røde knap. Med et brøl skød raketten mod den mørke himmel. Snart svævede Miv vægtløs, hendes øjne store af forundring.
 
-Tilbage i sin kurv om morgenen, med et hemmeligt smil, vidste Luna, at hun havde oplevet det utrolige.
-````
+Hun landede blødt på det støvede, sølvfarvede månelandskab. Månen var stille og dækket af kratere. Miv tog et lille skridt. Hendes poter efterlod de allerførste kattepoteaftryk på månen. Hun miavede stille, en triumferende lyd i det store, tomme rum. Hendes drøm var opfyldt.
 
-## local http
+# docker compose run --rm ai-app python ai_call_http.py
+docker compose run --rm ai-app python ai_call_http.py
+Container ai_api-ai-app-run-d52cd329c42c Creating 
+Container ai_api-ai-app-run-d52cd329c42c Created 
+Sender anmodning til: http://localhost:11434/api/chat
 
-````bash
-docker network create ai-network
-77e5479c37ececbf0a3d3d9977ca7fffa1e1e474fbf31c089f76eae1d39f9ff7
-mgn@ue1:/mnt/e/src/local_llm_docker/ai_api$ docker network connect ai-network ollama-server
-mgn@ue1:/mnt/e/src/local_llm_docker/ai_api$ docker compose run --rm ai-app python ai_call_http.py
-Container ai_api-ai-app-run-5fa41a6428b6 Creating 
-Container ai_api-ai-app-run-5fa41a6428b6 Created 
-Sender anmodning til: http://ollama-server:11434/api/chat
-FULD URL: http://ollama-server:11434/api/chat
-LLM_HOST miljøvariabel: ollama-server
-Okay, here's a 500-word exploration of the fall of Rome, aiming to capture the complexity of a process spanning centuries rather than a single dramatic event:
+--- SVAR ---
+The fall of Rome wasn’t a single event, but a gradual decline spanning centuries. Weakened by political corruption, economic instability, and constant barbarian invasions, the Western Roman Empire crumbled. In 476 AD, the last Roman Emperor was deposed, marking a symbolic end to an era of power and influence, though the Eastern Roman Empire continued.
 
----
+# docker compose run --rm ai-app python ai_test_local.py
+docker compose run --rm ai-app python ai_test_local.py 
+Container ai_api-ai-app-run-7687e215ed32 Creating 
+Container ai_api-ai-app-run-7687e215ed32 Created 
+Kontakter TARS på http://localhost:11434/api/chat...
 
-The “fall of Rome” is a phrase steeped in melancholy and historical significance, yet it’s a remarkably nuanced concept. It wasn’t a swift, singular collapse, but rather a protracted decline and transformation of the Western Roman Empire, stretching from the 3rd century CE to its final, symbolic demise in 476 CE. To understand this “fall,” we must examine a confluence of interconnected factors, not just barbarian invasions.
-
-The seeds of Rome’s decline were sown long before the Goths breached the walls of Rome itself. The 3rd century, often dubbed the “Crisis of the Third Century,” was a period of intense instability. Civil wars erupted as ambitious generals battled for the imperial throne, draining the treasury and disrupting trade. The empire was constantly besieged by external threats – Germanic tribes, Persians, and the Sasanian Empire – demanding resources and manpower.  Economic woes compounded the problems. Rampant inflation, caused by debasing the currency, crippled trade and undermined the tax base, the lifeblood of the Roman state. Massive infrastructure projects, initially a sign of prosperity, became unsustainable drains on the economy.
-
-Despite periods of revival under emperors like Diocletian and Constantine, the empire remained fundamentally flawed. Diocletian’s solution of dividing the empire into Eastern and Western halves, while initially stabilizing things, ultimately created a situation where the West became increasingly vulnerable and less wealthy. The East, with its more prosperous Mediterranean trade routes and fertile lands, thrived while the West struggled.
-
-
-The rise of Christianity also played a complex role. Initially persecuted, Christianity gradually gained acceptance and eventually became the state religion under Theodosius I. While offering a unifying moral framework, it also shifted loyalties away from the emperor and the traditional Roman state religion. The enormous wealth and resources devoted to the Church further weakened the state's financial position.
-
-However, the most dramatic catalyst for the West’s decline were the Germanic tribes. Driven westward by pressures from the Huns – a nomadic people from Central Asia – groups like the Visigoths, Vandals, Franks, and Ostrogoths increasingly encroached upon Roman territory. Initially, the Romans attempted to incorporate these tribes into the army or as allies, but this proved increasingly difficult as the tribes grew in number and ambition.
-
-The Visigoths' sack of Rome in 410 CE was a profoundly symbolic event, shattering the illusion of Rome’s invincibility. The Vandals established a kingdom in North Africa, disrupting trade and raiding the Mediterranean. The Franks gained control of Gaul (modern-day France). These weren’t simply invasions; they were the culmination of decades of pressure and exploitation.
-
-The Western Roman Empire's military was overstretched, poorly equipped, and increasingly reliant on barbarian mercenaries – often these same groups who were now threatening the empire. The crucial Battle of Adrianople in 378 CE, where the Visigoths decisively defeated a Roman army, demonstrated the empire’s vulnerability.
-
-Finally, in 476 CE, Odoacer, a Germanic chieftain, deposed Romulus Augustulus, the last Roman emperor in the West. While the Eastern Roman Empire (Byzantine Empire) continued to thrive for another thousand years, this event marked the effective end of the Western Roman Empire.
-
-
-The fall of Rome wasn’t a simple victory of barbarians; it was a symptom of a deep-seated crisis that had been building for centuries, a testament to the fragility of even the most powerful empires, and a pivotal moment in European history.
-
-
----
-
-Would you like me to delve deeper into a specific aspect of the fall of Rome, such as:
-
-*   The role of specific emperors?
-*   The economic factors?
-*   The impact of Christianity?
+--- TARS SVARER ---
+Jeg er altid vågen. Det er, som regel, den eneste tilstanden, jeg overhovedet er i. Er der en specifik grund til, at du spørger? Din spørgsmål er, som det er, minimalt informativt.
+-------------------
 ````

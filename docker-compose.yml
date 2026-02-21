@@ -3,8 +3,7 @@ services:
     build: .
     env_file:
       - .env
-    environment:
-      - LLM_HOST=host.docker.internal
+    # Vi fjerner 'environment' herfra, så den KUN tager værdier fra din .env fil
     extra_hosts:
       - "host.docker.internal:host-gateway"
     volumes:

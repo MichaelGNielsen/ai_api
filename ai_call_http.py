@@ -4,10 +4,17 @@ from dotenv import load_dotenv
 
 load_dotenv()
 
-# Hent host fra miljøvariabel eller brug 'localhost' som standard (til lokal kørsel)
+# Hent host fra miljøvariabel
 llm_host = os.getenv("LLM_HOST", "localhost")
-# Ollama bruger port 11434 og har et OpenAI-kompatibelt endpoint på /v1/chat/completions
-url = f"http://{llm_host}:11434/v1/chat/completions"
+
+# Fjern http:// hvis det er der, så vi selv kan styre det
+llm_host = llm_host.replace("http://", "").replace("https://", "")
+
+# Tjek om der allerede er en port (f.eks. :11434) i navnet
+if ":" in llm_host:
+    url = f"http://{llm_host}/api/chat"
+else:
+    url = f"http://{llm_host}:11434/api/chat"
 
 data = {
     "model": "gemma3:4b",
@@ -15,22 +22,17 @@ data = {
         {"role": "system", "content": "You are a helpful assistant."},
         {"role": "user", "content": "Please write 500 words about the fall of Rome."},
     ],
+    "stream": False
 }
 
 try:
     print(f"Sender anmodning til: {url}")
-    print(f"FULD URL: {url}")
-    print(f"LLM_HOST miljøvariabel: {os.getenv('LLM_HOST')}")
-    # Tilføj en længere timeout for at give den lokale model tid til at tænke (især på CPU)
     response = requests.post(url, json=data, timeout=300)
-    response.raise_for_status()  # Kaster en fejl ved HTTP-fejlkoder (f.eks. 404, 500)
+    response.raise_for_status()
 
-    # Print modellens svar
-    reply = response.json()["choices"][0]["message"]["content"]
+    reply = response.json()["message"]["content"]
+    print("\n--- SVAR ---")
     print(reply)
 
-except requests.exceptions.RequestException as e:
-    print(f"\nFEJL: Kunne ikke kontakte LLM-serveren: {e}")
-except (KeyError, IndexError):
-    print("\nFEJL: Modtog et uventet svarformat fra serveren.")
-    print("Rå-svar:", response.text)
+except Exception as e:
+    print(f"\nFEJL: Kunne ikke kontakte LLM-serveren på {url}: {e}")
