@@ -1,3 +1,6 @@
 .env
 *.html
 .history
+!.env_wsl
+!.env_nuc
+!.env_rpi5
