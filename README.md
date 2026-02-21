@@ -1,5 +1,34 @@
 # run llm from docker
 
+Denne projektmappe indeholder to måder at køre AI på:
+
+| Script | Type | AI Model | Krav |
+| :--- | :--- | :--- | :--- |
+| **`ai_call_http.py`** | **LOKAL** | `gemma3:4b` | Ollama skal køre lokalt (se `DOCKER_HOWTO.md`) |
+| **`ai_test.py`** | **CLOUD** | `gemini-2.5-flash` | Internet + API-nøgle i `.env` |
+
+---
+
+## Hurtig Start
+
+### 1. Kør Lokal AI (Gemma 3)
+```bash
+# Start Ollama (hvis ikke allerede kører)
+docker run -d --name ollama-nuc -p 11434:11434 -v ollama_data:/root/.ollama ollama/ollama
+docker exec -it ollama-nuc ollama run gemma3:4b
+
+# Kør scriptet
+docker compose run --rm ai-app python ai_call_http.py
+```
+
+### 2. Kør Cloud AI (Gemini)
+```bash
+# Indsæt din nøgle i .env: VITE_API_KEY=xxx
+docker compose run --rm ai-app python ai_test.py
+```
+
+---
+
 set i denne ![video](https://youtu.be/km5-0jhv0JI)
 
 ![Python script displaying HTTP API call to local LLM model with requests library, showing endpoint configuration for llama.cpp v1 chat completions at localhost:12434, data dictionary with ai/smollm2 model and system/user message roles, and response handling with JSON parsing](pictures/ai_http_call.png)
@@ -18,6 +47,7 @@ docker model run gemma3
 
 ````bash
 docker build -t min-ai-app . && docker run --rm min-ai-app
+docker compose run --rm ai-app python ai_test.py
 
 #eller
 docker compose up -d --build
@@ -82,23 +112,25 @@ Kommandoen betyder: "Brug Docker Compose til at starte en ny, midlertidig contai
 
 Det er en utrolig effektiv måde at køre dine scripts på, fordi du er garanteret, at de altid kører i det samme, korrekte miljø med alle de nødvendige biblioteker og konfigurationer, uanset hvilken computer du er på.
 
-### 4. kald til Google Gemini (ai_test.py) 
+### 4. kald til Google Gemini (ai_test.py)
 
 ````bash
 # start docker container and call script
-compose run --rm ai-app python ai_test.py
+docker compose run --rm ai-app python ai_test.py
 
 #output
-Container ai_api-ai-app-run-006fa536b051 Creating 
-Container ai_api-ai-app-run-006fa536b051 Created 
-Forsøger at kontakte Gemini (gemini-2.5-flash)...
-Misse, en lille stribet kat, elskede at stirre på den store, runde måne om natten. En aften tænkte hun: "Jeg må derop!"
+Container ai_api-ai-app-run-246c79107c07 Creating
+Container ai_api-ai-app-run-246c79107c07 Created
+Forsøger at kontakte Gemini Cloud (gemini-2.5-flash)...
 
-Hun sneg sig ind i et hemmeligt rumlaboratorium og fandt en lille raket. Med et brøl skød den af sted, op gennem skyerne og videre ud i det mørke rum.
+SVAR FRA CLOUD AI:
+Der var engang en lille kat ved navn Luna. Hun havde store, drømmende øjne og en hemmelig længsel efter månen.
 
-Snart landede Misse blødt på Månen. Jorden var en smuk, blå marmorkugle. Misse sprang rundt i det lave tyngdefelt og jagede støvkaniner. Hun fandt endda en bid lækker måneost.
+Hver nat, når alle sov, drømte Luna, at hun byggede en funklende sølvraket. Med et hop var hun inde, og raketten susede opad, forbi stjernerne.
 
-Træt men glad rejste Misse tilbage til sin seng. Hun drømte søde drømme om eventyr blandt stjernerne.
+Snart landede hun blødt på den støvede, grå overflade. Der var ingen garnnøgler at lege med, ingen mus at jage. Bare en uendelig stilhed og en betagende udsigt til Jorden, der lyste blåt.
+
+Luna strakte sig, spandt tilfreds og vidste, at hun nu var den eneste kat på månen. Før daggry fløj hun hjem, og vågnede i sin kurv med et smil. Månen var ikke længere bare en prik på himlen; den var hendes hemmelige ven.
 ````
 
 ### 5. kald til http
@@ -113,7 +145,7 @@ docker run -d --name ollama-server \
   ollama/ollama serve
 
 # stop gemma3
-docker stop busy_perlman  
+docker stop busy_perlman
 
 # test gemma3 is running
 curl http://localhost:11434
@@ -127,45 +159,29 @@ curl http://localhost:11434/api/tags
 docker compose run --rm ai-app python ai_call_http.py
 
 # output
-Container ai_api-ai-app-run-a1217dc75d0c Creating 
-Container ai_api-ai-app-run-a1217dc75d0c Created 
-Sender anmodning til: http://host.docker.internal:12434/engines/llama.cpp/v1/chat/completions
-Okay, here’s a 500-word exploration of the fall of Rome, aiming to provide a nuanced understanding of a complex and protracted process, rather than a simple “one-cause” explanation:
+Container ai_api-ai-app-run-89c221f7b836 Creating
+Container ai_api-ai-app-run-89c221f7b836 Created
+Sender anmodning til: http://host.docker.internal:11434/v1/chat/completions
+FULD URL: http://host.docker.internal:11434/v1/chat/completions
+LLM_HOST miljøvariabel: host.docker.internal
+Okay, here’s a 500-word exploration of the fall of Rome, focusing on the complex and multifaceted factors involved – it wasn't a single event, but a gradual decline spanning centuries:
 
 ---
 
-The "fall of Rome" isn’t a single event, but a centuries-long process of decline and transformation that culminated in the collapse of the Western Roman Empire in 476 CE. To understand this dramatic shift, it’s crucial to recognize that Rome didn’t simply “fall”; it morphed, fractured, and ultimately yielded to a complex interplay of internal weaknesses and external pressures.
+The fall of the Roman Empire, a seemingly monolithic event often depicted as a simple collapse, was, in reality, a protracted and agonizing process. While the traditional date of 476 CE marks the deposition of Romulus Augustulus, the last Western Roman Emperor, the seeds of its decline were sown decades, even centuries, earlier. To understand this pivotal moment in Western civilization, we need to recognize a confluence of political, economic, military, and social pressures.
 
-**The Seeds of Decay (3rd - 5th Centuries):**
+**Political Instability and Corruption:** The Roman Empire had grown accustomed to autocratic rule, but the system gradually eroded. The succession of Emperors was notoriously volatile, often decided through violent power struggles, assassinations, and civil wars. The “Crisis of the Third Century” (235-284 CE) saw a terrifying rapid-fire succession of emperors, many of whom reigned for mere months, destabilizing the government and draining the treasury.  The rise of powerful generals, like Marius and Sulla, who commanded loyal armies instead of serving the state, further undermined the authority of the Senate and centralized control. Corruption became rampant at all levels of government, diminishing public trust and hindering effective administration.
 
-By the 3rd century CE, the vast Roman Empire was already showing signs of strain. The Pax Romana, a period of relative peace and prosperity, was fading. Political instability was rampant. Emperors rose and fell rapidly, often through military force, leading to civil wars and a weakening of central authority. The sheer size of the Empire made effective governance increasingly difficult, and the bureaucracy became bloated and corrupt.
+**Economic Woes:** Rome’s vast empire, while initially a source of immense wealth, eventually became a drain on its resources. Constant warfare, lavish building projects (aqueducts, roads, and temples), and the demands of a large, often poorly paid, army stretched the empire’s finances to the breaking point. Excessive taxation, particularly on agriculture, crippled the economy, forcing farmers into poverty and leading to a decline in food production.  Trade, a critical element of Rome’s prosperity, was disrupted by piracy and instability.  Furthermore, the reliance on slave labor stifled innovation and prevented the development of a robust free labor market.
 
-Economic woes were equally significant. Constant warfare drained the treasury, while inflation and heavy taxation crippled the middle class. Trade routes were disrupted, and agricultural production declined due to factors like climate change and soil exhaustion. The reliance on slave labor, while initially a source of wealth, ultimately stifled innovation and limited economic mobility.
+**Military Overstretch and Barbarian Invasions:** The Roman army, once the most efficient and disciplined fighting force in the world, was increasingly burdened by defending a vast and porous border.  The constant need to recruit mercenaries, many of whom were "barbarians" (Germanic tribes, Goths, Vandals, etc.), diluted the army’s quality and loyalty. These tribes, initially seeking trade or refuge within the empire, were steadily drawn in by the empire’s weakness and the promise of land and plunder.  The Visigoths’ devastating sack of Rome in 410 CE, under Alaric, shattered the myth of Roman invincibility.  The Goths, pushed westward by the Huns, eventually established their own kingdoms within the empire’s territories, culminating in the Visigothic Kingdom of Spain.
 
-**External Threats Intensify:**
-
-While internal problems were brewing, external threats steadily escalated. The Germanic tribes – Visigoths, Vandals, Franks, and others – were pushed westward by the Huns, a nomadic group from Central Asia. Initially, Rome attempted to incorporate these tribes as *foederati* (allies), providing them with land in exchange for military service. However, this proved unsustainable.
-
-The Visigoths, after being betrayed by the Roman government, sacked Rome in 410 CE, a profoundly symbolic event that shattered the illusion of Roman invincibility. The Vandals established a kingdom in North Africa, cutting off vital grain supplies to Rome.  The pressure from multiple tribes, coupled with the weakening Roman military, proved too much to bear.
-
-**The Division and the West’s Struggle:**
-
-In 395 CE, the empire was formally divided into Western and Eastern halves. The Eastern Roman Empire, later known as the Byzantine Empire, with its capital in Constantinople, proved far more resilient, benefiting from a more fertile location, a stronger economy, and a more stable political system. The West, however, struggled to maintain control.
-
-The Battle of Adrianople in 378 CE, where the Visigoths decisively defeated a Roman army, exposed the vulnerability of the Western legions and marked a turning point.  The deposition of Romulus Augustulus, the last Western Roman Emperor, in 476 CE by the Germanic chieftain Odoacer, is often cited as the “fall,” but it was more of a symbolic act than a fundamental shift.
-
-**Beyond Military Collapse:**
-
-It's vital to understand that the fall wasn't solely a military affair. The decline was also characterized by:
-
-* **Social Fragmentation:**  The traditional Roman values of civic duty and public service eroded, replaced by a focus on personal wealth and security.
-* **Decline in Literacy and Learning:** The loss of patronage from wealthy elites led to a decline in education and scholarship.
-* **Rise of Christianity:** While Christianity eventually became the state religion, its early growth arguably challenged traditional Roman beliefs and values, though its impact is debated among historians.
+**Social Decay & Loss of Civic Virtue:**  A decline in social cohesion played a significant role.  The traditional Roman values of civic duty, patriotism, and discipline eroded as luxury and decadence became increasingly prevalent among the wealthy elite. The gap between the rich and the poor widened, creating social unrest and resentment.  The rise of Christianity, while eventually becoming the dominant religion, initially presented a challenge to the established Roman religious order and contributed to a shift in focus away from the state.
 
 
-Ultimately, the fall of Rome represents a complex and multifaceted historical process. It wasn't a sudden collapse, but a gradual transformation shaped by internal weaknesses and the unrelenting pressure of external forces. The legacy of Rome – its laws, language, architecture, and political ideas – continued to shape Europe for centuries to come, even as the Western Empire faded into memory.
+Ultimately, the Western Roman Empire succumbed to these combined pressures. The Eastern Roman Empire (Byzantium), with its stronger economy, strategic location, and more effective administration, continued to flourish for another thousand years.  The fall of Rome wasn’t a single dramatic collapse, but a slow, agonizing erosion of power, fueled by internal weaknesses and external threats – a testament to the complex dynamics of empire and its eventual demise.
 
 ---
 
-Would you like me to delve deeper into a specific aspect of the fall of Rome, such as the role of the Huns, the economic factors, or the Byzantine Empire’s survival?
+Would you like me to delve deeper into a specific aspect of the fall of Rome, such as a particular period (e.g., the Crisis of the Third Century), a specific group of people (e.g., the Goths), or a specific contributing factor (e.g., economic decline)?
 ````
