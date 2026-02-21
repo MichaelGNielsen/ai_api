@@ -66,6 +66,12 @@ curl http://localhost:11434
 # Forventet svar: Ollama is running
 ```
 
+## localhost:11434
+
+![localhost:11434](pictures/localhost_ollama.png)
+
+### Fig 1 localhost:11434 - Ollama is running, viser local LLM kører
+
 ---
 
 ## 2. Kør Python Scripts via Docker Compose
